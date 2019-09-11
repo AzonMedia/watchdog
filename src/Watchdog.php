@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 declare(strict_types=1);
 
@@ -42,4 +43,3 @@ class Watchdog
         Kernel::log(sprintf('Worker with id %s not responding more than %s seconds. Worker process id %s killed.', $worker_id, self::KILL_WORKER_AFTER_NO_RESPONCE_SECONDS, $worker_pid), LogLevel::CRITICAL);
     }
 }
-
