@@ -55,7 +55,7 @@ class SwooleTableBackend
         $HearthbeatFunction = function() use ($that, $worker_pid, $worker_id) {
              do {
                 $that->SwooleTable->set((string) $worker_id , array('updated_by_worker_id' => $worker_id, 'worker_pid' => $worker_pid, 'updated_time' => time()));
-                \Co::Sleep(Watchdog::HEART_BEAT_SECONDS);
+                \Swoole\Coroutine\System::Sleep(Watchdog::HEART_BEAT_SECONDS);
             } while (true);      
         };
         
@@ -75,7 +75,7 @@ class SwooleTableBackend
                          $that->delete_record((string) $row['updated_by_worker_id']);
                      }
                 }
-                \Co::Sleep(Watchdog::CHECK_WORKER_STATUS_SECONDS);
+                \Swoole\Coroutine\System::Sleep(Watchdog::CHECK_WORKER_STATUS_SECONDS);
             } while (true);
         };
         
