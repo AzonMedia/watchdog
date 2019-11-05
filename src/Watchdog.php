@@ -9,8 +9,8 @@ use Psr\Log\LogLevel;
 
 class Watchdog
 {    
-    const HEART_BEAT_SECONDS = 1;
-    const CHECK_WORKER_STATUS_SECONDS = 1;
+    const HEART_BEAT_MILISECONDS = 1000;
+    const CHECK_WORKER_STATUS_MILISECONDS = 1000;
     const KILL_WORKER_AFTER_NO_RESPONCE_SECONDS = 1;
     
     private $Backend;

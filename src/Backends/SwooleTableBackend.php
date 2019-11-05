@@ -5,6 +5,8 @@ namespace Azonmedia\Watchdog\Backends;
 
 use Azonmedia\Watchdog\Interfaces\BackendInterface;
 use Azonmedia\Watchdog\Watchdog;
+use Guzaba2\Kernel\Kernel;
+use Psr\Log\LogLevel;
 
 class SwooleTableBackend
     implements BackendInterface
@@ -52,34 +54,27 @@ class SwooleTableBackend
     public function checkin(int $worker_pid, int $worker_id) : void
     {  
         $that = $this;
-        $HearthbeatFunction = function() use ($that, $worker_pid, $worker_id) {
-             do {
-                $that->SwooleTable->set((string) $worker_id , array('updated_by_worker_id' => $worker_id, 'worker_pid' => $worker_pid, 'updated_time' => time()));
-                \Swoole\Coroutine\System::Sleep(Watchdog::HEART_BEAT_SECONDS);
-            } while (true);      
-        };
-        
-        go($HearthbeatFunction);       
+
+        \Swoole\Timer::tick(Watchdog::HEART_BEAT_MILISECONDS, function() use ($that, $worker_pid, $worker_id) {
+                $that->SwooleTable->set((string) $worker_id , array('updated_by_worker_id' => $worker_id, 'worker_pid' => $worker_pid, 'updated_time' => time()));                
+                //Kernel::log('watchdog checkin', LogLevel::CRITICAL);     
+        });   
     }
     
     public function check() : void
     {
         $that = $this;
-        $MonitorFunction  = function() use ($that) {
-            do {
-                foreach($that->SwooleTable as $row) {
-                     if (time() - $row['updated_time'] > Watchdog::KILL_WORKER_AFTER_NO_RESPONCE_SECONDS) {
-                         Watchdog::kill_worker($row['worker_pid'], $row['updated_by_worker_id']);
-                         // May be delete record is not needed, because after worker is killed a new one with same id is started.
-                         // But just in case i will delete record from swoole table.
-                         $that->delete_record((string) $row['updated_by_worker_id']);
-                     }
+        \Swoole\Timer::tick(Watchdog::CHECK_WORKER_STATUS_MILISECONDS, function () use ($that) {
+            foreach($that->SwooleTable as $row) {
+                //Kernel::log('watchdog check'.$row['worker_pid'], LogLevel::CRITICAL);
+                if (time() - $row['updated_time'] > Watchdog::KILL_WORKER_AFTER_NO_RESPONCE_SECONDS) {
+                    Watchdog::kill_worker($row['worker_pid'], $row['updated_by_worker_id']);
+                    // May be delete record is not needed, because after worker is killed a new one with same id is started.
+                    // But just in case i will delete record from swoole table.
+                    $that->delete_record((string) $row['updated_by_worker_id']);
                 }
-                \Swoole\Coroutine\System::Sleep(Watchdog::CHECK_WORKER_STATUS_SECONDS);
-            } while (true);
-        };
-        
-        go($MonitorFunction);
+           }
+        });
     }
     
     public function delete_record(string $worker_id) : void 
