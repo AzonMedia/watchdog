@@ -14,6 +14,7 @@
         }
     ],
     "require": {
+        "azonmedia/components": "dev-master",
         "php": ">=7.2.0"
     },
     "autoload": {
