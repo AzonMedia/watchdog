@@ -4,7 +4,7 @@
     "description": "Watchdog for Swoole workers",
     "keywords": ["watchdog"],
     "homepage": "https://github.com/AzonMedia/watchdog",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "authors": [
         {
             "name": "Vesko Kenashkov",
