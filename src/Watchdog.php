@@ -11,7 +11,7 @@ class Watchdog
 {    
     const HEART_BEAT_MILISECONDS = 1000;
     const CHECK_WORKER_STATUS_MILISECONDS = 1000;
-    const KILL_WORKER_AFTER_NO_RESPONCE_SECONDS = 3;
+    const KILL_WORKER_AFTER_NO_RESPONCE_SECONDS = 5;
     
     private $Backend;
     
